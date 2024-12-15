@@ -1,0 +1,232 @@
+
+Creating a fully functional programming language with LLVM IR as its backend requires a set of core tasks that you would need to implement in order to handle various features like control flow, memory management, functions, variables, data types, and more. These tasks represent the fundamental building blocks necessary to create a language with a functional runtime and compiler support.
+
+Here’s a comprehensive list of standard tasks you will need to consider when creating a new programming language using LLVM IR:
+1. Function Definition and Calling
+
+    Task: Create functions, define their parameters, return types, and call them from other functions.
+    Key LLVM IR Constructs:
+        define for defining functions.
+        declare for declaring external functions.
+        call for invoking functions.
+        ret for returning values from functions.
+    Example:
+
+    define i32 @add(i32 %a, i32 %b) {
+        %sum = add i32 %a, %b
+        ret i32 %sum
+    }
+
+    define i32 @main() {
+        %result = call i32 @add(i32 5, i32 10)
+        ret i32 %result
+    }
+
+2. Variable Declaration and Memory Management
+
+    Task: Declare and manipulate variables (both local and global), and manage memory (stack and heap).
+    Key LLVM IR Constructs:
+        alloca for stack-allocated variables.
+        load and store for accessing and modifying variables.
+        malloc for heap allocation (via external function declaration).
+        free for deallocating memory.
+    Example:
+
+    define i32 @main() {
+        %x = alloca i32
+        store i32 42, i32* %x
+        %val = load i32, i32* %x
+        ret i32 %val
+    }
+
+3. Control Flow
+
+    Task: Implement control structures like conditionals, loops, and branching.
+    Key LLVM IR Constructs:
+        br for branching.
+        icmp for integer comparisons.
+        fcmp for floating-point comparisons.
+        switch for switch-case structures (if needed).
+    Example:
+
+    define i32 @main() {
+    entry:
+        %x = alloca i32
+        store i32 10, i32* %x
+        %val = load i32, i32* %x
+        %cmp = icmp eq i32 %val, 10
+        br i1 %cmp, label %equal, label %not_equal
+
+    equal:
+        ret i32 1
+
+    not_equal:
+        ret i32 0
+    }
+
+4. Data Types and Type System
+
+    Task: Support basic data types like integers, floating-point numbers, pointers, and arrays.
+    Key LLVM IR Constructs:
+        i32, i8, float, double, etc., for primitive types.
+        i8*, i32*, etc., for pointers.
+        array (with alloca or malloc) for arrays.
+        Structs for complex data structures.
+    Example:
+
+    %struct.Person = type { i32, i8* }
+
+    define void @create_person() {
+        %p = alloca %struct.Person
+        %name = getelementptr inbounds %struct.Person, %struct.Person* %p, i32 0, i32 1
+        store i8* null, i8** %name
+        ret void
+    }
+
+5. Arithmetic and Bitwise Operations
+
+    Task: Perform arithmetic and bitwise operations like addition, subtraction, multiplication, division, and logical operations.
+    Key LLVM IR Constructs:
+        add, sub, mul, div for arithmetic.
+        and, or, xor, shl, shr for bitwise operations.
+    Example:
+
+    %a = add i32 %x, %y
+    %b = and i32 %a, 0xFF
+
+6. Memory Management (Dynamic Allocation)
+
+    Task: Support heap memory allocation and deallocation.
+    Key LLVM IR Constructs:
+        malloc (via external declaration).
+        free (via external declaration).
+        alloca for stack-based allocation.
+    Example:
+
+    declare i8* @malloc(i32)
+    declare void @free(i8*)
+
+    define i32 @main() {
+        %ptr = call i8* @malloc(i32 4)
+        %int_ptr = bitcast i8* %ptr to i32*
+        store i32 100, i32* %int_ptr
+        call void @free(i8* %ptr)
+        ret i32 0
+    }
+
+7. Exception Handling (Try/Catch)
+
+    Task: Implement exception handling mechanisms to handle runtime errors.
+    Key LLVM IR Constructs:
+        invoke to call a function that might throw.
+        landingpad to handle exceptions.
+    Example:
+
+    define void @foo() {
+    entry:
+        invoke void @function_that_might_throw()
+            to label %normal_exit
+            unwind to label %exception_handler
+
+    exception_handler:
+        ; Handle exception
+        ret void
+
+    normal_exit:
+        ret void
+    }
+
+8. Global Variables
+
+    Task: Declare and use global variables that persist across function calls.
+    Key LLVM IR Constructs:
+        @ to define global variables.
+        global to initialize them.
+        load and store for accessing and modifying them.
+    Example:
+
+    @global_var = global i32 42
+
+    define i32 @main() {
+        %val = load i32, i32* @global_var
+        ret i32 %val
+    }
+
+9. Library Integration and External Function Calls
+
+    Task: Declare and call external functions, such as printf, or integrate with external libraries.
+    Key LLVM IR Constructs:
+        declare for declaring external functions.
+        call for invoking external functions.
+    Example:
+
+    declare i32 @printf(i8*, ...)
+
+    define i32 @main() {
+        %msg = getelementptr [13 x i8], [13 x i8]* @str, i32 0, i32 0
+        call i32 @printf(i8* %msg)
+        ret i32 0
+    }
+
+    @str = private constant [13 x i8] c"Hello, world!\00"
+
+10. Type Casting
+
+    Task: Perform explicit type conversions between integers, floats, and pointers.
+    Key LLVM IR Constructs:
+        sitofp, fptosi, bitcast for casting.
+    Example:
+
+    %int_to_float = sitofp i32 %int_val to float
+    %float_to_int = fptosi float %float_val to i32
+
+11. Structs and Complex Data Types
+
+    Task: Support complex data structures like structs (similar to C structs or classes).
+    Key LLVM IR Constructs:
+        type for defining structs.
+        getelementptr for accessing fields in structs.
+    Example:
+
+    %struct.Person = type { i32, i8* }
+    define void @create_person() {
+        %p = alloca %struct.Person
+        %name = getelementptr inbounds %struct.Person, %struct.Person* %p, i32 0, i32 1
+        store i8* null, i8** %name
+        ret void
+    }
+
+12. Arrays and Collections
+
+    Task: Support arrays (static and dynamic), and perform operations like indexing and iteration.
+    Key LLVM IR Constructs:
+        alloca for stack-allocated arrays.
+        getelementptr for indexing into arrays.
+    Example:
+
+    define i32 @main() {
+        %arr = alloca [5 x i32]
+        %elem = getelementptr [5 x i32], [5 x i32]* %arr, i32 0, i32 2
+        store i32 42, i32* %elem
+        ret i32 0
+    }
+
+Summary of Tasks to Create a Fully Functional Language:
+
+    Function Definition and Calls
+    Variable Declaration and Memory Management
+    Control Flow (Loops, Conditionals)
+    Arithmetic and Bitwise Operations
+    Exception Handling
+    Type System (Primitives, Pointers, Structs, Arrays)
+    Global Variables
+    Dynamic Memory Allocation (malloc, free)
+    External Function Calls (e.g., printf)
+    Casting Between Types
+    Structs and Complex Data Types
+    Arrays and Collection Management
+
+These tasks represent the core functionality that any general-purpose programming language requires. By supporting these in LLVM IR, you can create a language that has all the necessary features for computation, memory management, control flow, and interfacing with other libraries.
+
+
+ChatGPT can make mistakes. Check important info.
