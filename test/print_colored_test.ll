@@ -9,23 +9,16 @@
 ;ls
 ;./test_program
 ;;endofbash
+; ModuleID = 'MyModule'
 
-; ModuleID = 'color_printing.ll'
-source_filename = "color_printing.ll"
+source_filename = "MyModule"
 
-@fmt = private constant [30 x i8] c"\033[31mThis text is red!\033[0m\0A\00", align 1
+@0 = private unnamed_addr constant [28 x i8] c"\1B[31mThis text is red!\1B[0m\0A\00", align 1
 
-declare i32 @printf(i8*, ...) #1
+declare i32 @printf(i8*, ...)
 
 define i32 @main() {
 entry:
-  ; Get the pointer to the formatted string
-  %str = getelementptr inbounds [30 x i8], [30 x i8]* @fmt, i32 0, i32 0
-
-  ; Call printf to print the formatted string (red text)
-  call i32 (i8*, ...) @printf(i8* %str)
-
+  %0 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([28 x i8], [28 x i8]* @0, i32 0, i32 0))
   ret i32 0
 }
-
-attributes #1 = { noinline nounwind }
